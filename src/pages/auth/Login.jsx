@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { loginUser } from "../../api/authApi";
 import atisunyaLogo from "../../assets/atisunya-logo.png";
 
+console.log("LOGIN ENV =", import.meta.env.VITE_API_BASE_URL);
+
 const LOGIN_CONTENT = {
   companyName: "Atisunya Pvt. Ltd.",
   heading: "Sign in to your account",
@@ -115,29 +117,34 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await loginUser(values);
+      const response = await loginUser({
+  email: values.username,
+  password: values.password,
+});
 
-      const token =
-        response?.data?.token ||
-        response?.token ||
-        response?.accessToken ||
-        null;
+const accessToken = response?.data?.token || null;
+const user = response?.data?.user || null;
 
-      const user =
-        response?.data?.user ||
-        response?.user ||
-        response ||
-        null;
+if (values.remember) {
+  if (accessToken) {
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("token", accessToken);
+  }
+  if (user) {
+    localStorage.setItem("user", JSON.stringify(user));
+  }
+} else {
+  if (accessToken) {
+    sessionStorage.setItem("accessToken", accessToken);
+    sessionStorage.setItem("token", accessToken);
+  }
+  if (user) {
+    sessionStorage.setItem("user", JSON.stringify(user));
+  }
+}
 
-      if (token) {
-        localStorage.setItem("accessToken", token);
-      }
+navigate("/dashboard", { replace: true });
 
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
-      }
-
-      navigate("/dashboard");
     } catch (error) {
       const message =
         error?.response?.data?.message ||
@@ -196,9 +203,9 @@ const Login = () => {
 
           <form onSubmit={formik.handleSubmit} className="space-y-5">
             <FormField
-              label="Username"
+              label="Email"
               name="username"
-              placeholder="Enter your username"
+              placeholder="Enter your Email"
               formik={formik}
             />
 

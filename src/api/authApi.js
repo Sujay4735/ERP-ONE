@@ -1,18 +1,10 @@
-import axios from "axios";
+import api from "./axios";
 
-export const loginUser = async (values) => {
-  const response = await axios.post(
-    "https://dummyjson.com/auth/login",
-    {
-      username: values.username,
-      password: values.password,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+export const loginUser = async (data) => {
+  const response = await api.post("/auth/login", {
+    email: data.email,
+    password: data.password,
+  });
 
   return response.data;
 };

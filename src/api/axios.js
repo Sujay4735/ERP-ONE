@@ -1,16 +1,19 @@
 import axios from "axios";
 
+console.log("BASE URL =", import.meta.env.VITE_API_BASE_URL);
+
 const api = axios.create({
-  baseURL: "https://dummyjson.com",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// REQUEST INTERCEPTOR
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token =
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -21,7 +24,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// RESPONSE INTERCEPTOR
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -30,9 +32,11 @@ api.interceptors.response.use(
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
 
-      // redirect to login
-      window.location.href = "/";
-      // or "/login"
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
+      sessionStorage.removeItem("user");
+
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);

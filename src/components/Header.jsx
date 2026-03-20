@@ -6,6 +6,7 @@ import {
   FaStar,
   FaHome,
   FaSignOutAlt,
+  FaUserCircle,
 } from "react-icons/fa";
 
 const Header = () => {
@@ -16,13 +17,22 @@ const Header = () => {
 
   const dropdownRef = useRef(null);
 
+  const storedUser =
+    localStorage.getItem("user") || sessionStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
   const handleLogout = () => {
+    localStorage.removeItem("token");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
 
-    navigate("/"); 
-    // if your login route is /login then use navigate("/login");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("user");
+
+    window.location.href = "/login";
   };
 
   useEffect(() => {
@@ -41,7 +51,6 @@ const Header = () => {
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white border-b z-[10000]">
-      {/* Top White Header */}
       <div className="flex items-center justify-between px-6 h-[60px]">
         <div className="flex items-center gap-6">
           <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded">
@@ -66,13 +75,16 @@ const Header = () => {
           <span className="text-sm cursor-pointer">Help</span>
           <span className="text-sm cursor-pointer">Feedback</span>
 
-          <span className="font-medium text-sm">SUJAY AND VIKALP</span>
+          <div className="flex items-center gap-2">
+            <FaUserCircle size={22} className="text-gray-600" />
+            <span className="font-medium text-sm">
+              {user?.name || user?.email || "User"}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Blue Bar */}
       <div className="flex items-center justify-between px-6 py-1.8 bg-[#385a7a] text-white text-sm">
-        {/* Left Side */}
         <div className="flex items-center gap-6">
           <div className="flex gap-4 items-center">
             <FaClock className="cursor-pointer" />
@@ -180,7 +192,6 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Right Side */}
         <div className="flex items-center">
           <button
             onClick={handleLogout}
